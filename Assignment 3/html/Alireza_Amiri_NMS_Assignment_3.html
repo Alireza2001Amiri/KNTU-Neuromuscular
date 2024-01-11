@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Alireza_Amiri_NMS_Assignment_3</title><meta name="generator" content="MATLAB 9.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2024-01-09"><meta name="DC.source" content="Alireza_Amiri_NMS_Assignment_3.m"><style type="text/css">
+      --><title>Alireza_Amiri_NMS_Assignment_3</title><meta name="generator" content="MATLAB 9.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2024-01-10"><meta name="DC.source" content="Alireza_Amiri_NMS_Assignment_3.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -67,21 +67,28 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2"><b>Load and display data</b></a></li><li><a href="#3">Detrend data and plot Signals</a></li></ul></div><pre class="codeinput">clc
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2"><b>Load and display data</b></a></li><li><a href="#3">Detrend data and plot Signals</a></li><li><a href="#4">Finding Blink,Fixation and Saccade</a></li><li><a href="#5">Calculating Blink,Fixation and Saccade frequency</a></li></ul></div><pre class="codeinput">clc
 clear <span class="string">all</span>
 close <span class="string">all</span>
 </pre><h2 id="2"><b>Load and display data</b></h2><pre class="codeinput">load(<span class="string">'D:\University\Khaje\Semester 1\&#1705;&#1606;&#1578;&#1585;&#1604; &#1587;&#1740;&#1587;&#1578;&#1605; &#1607;&#1575;&#1740; &#1593;&#1589;&#1576;&#1740; &#1593;&#1590;&#1604;&#1575;&#1606;&#1740;\Assignment 3\data.mat'</span>)
 
-Raw_Horizontal = data.A;
-Raw_Vertical = data.B;
+Raw_Horizontal = data.B;
+Raw_Vertical = data.A;
 
 figure(1)
-plot(Raw_Horizontal , Raw_Vertical)
-title(<span class="string">'Vetical vs Horizontal'</span>)
-</pre><img vspace="5" hspace="5" src="Alireza_Amiri_NMS_Assignment_3_01.png" alt=""> <h2 id="3">Detrend data and plot Signals</h2><p>Question 1</p><pre class="codeinput">Detrended_Raw_Horizontal = detrend(Raw_Horizontal);
-Detrended_Raw_Vertical = detrend(Raw_Vertical);
+hold <span class="string">on</span>
+plot(1:length(Raw_Horizontal) , Raw_Horizontal);
+plot(1:length(Raw_Vertical) , Raw_Vertical);
+title(<span class="string">'Raw data'</span>)
+legend(<span class="string">'Raw Horizontal'</span>, <span class="string">'Raw Vertical'</span>)
 
 figure(2)
+plot(Raw_Horizontal , Raw_Vertical)
+title(<span class="string">'Vertical vs Horizontal'</span>)
+</pre><img vspace="5" hspace="5" src="Alireza_Amiri_NMS_Assignment_3_01.png" alt=""> <img vspace="5" hspace="5" src="Alireza_Amiri_NMS_Assignment_3_02.png" alt=""> <h2 id="3">Detrend data and plot Signals</h2><p>Question 1</p><pre class="codeinput">Detrended_Raw_Horizontal = detrend(Raw_Horizontal);
+Detrended_Raw_Vertical = detrend(Raw_Vertical);
+
+figure(3)
 title(<span class="string">'Raw signals vs Detrended Signals'</span>)
 hold <span class="string">on</span>
 plot(1:length(Raw_Horizontal) , Raw_Horizontal);
@@ -89,7 +96,124 @@ plot(1:length(Raw_Vertical) , Raw_Vertical);
 plot(1:length(Detrended_Raw_Horizontal) , Detrended_Raw_Horizontal);
 plot(1:length(Detrended_Raw_Vertical), Detrended_Raw_Vertical);
 legend(<span class="string">'Raw Horizontal'</span>, <span class="string">'Raw Vertical'</span> , <span class="string">'Detrended Raw Horizontal'</span> ,<span class="string">'Detrended Raw Vertical'</span> , <span class="string">'Location'</span>,<span class="string">'best'</span>)
-</pre><img vspace="5" hspace="5" src="Alireza_Amiri_NMS_Assignment_3_02.png" alt=""> <img vspace="5" hspace="5" src="Alireza_Amiri_NMS_Assignment_3_03.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2023a</a><br></p></div><!--
+</pre><img vspace="5" hspace="5" src="Alireza_Amiri_NMS_Assignment_3_03.png" alt=""> <img vspace="5" hspace="5" src="Alireza_Amiri_NMS_Assignment_3_04.png" alt=""> <h2 id="4">Finding Blink,Fixation and Saccade</h2><p>Question 2</p><pre class="codeinput"><span class="comment">%assuming sample rate is 250 Hz</span>
+time = (1:length(Raw_Horizontal))/250;
+velH = diff(Detrended_Raw_Horizontal)./diff(time);
+velV = diff(Detrended_Raw_Vertical)./diff(time);
+figure(4)
+subplot(2,1,1)
+plot(time , [velH , 0])
+title(<span class="string">'Horizontal Velocity'</span>)
+subplot(2,1,2)
+plot(time , [velV , 0])
+title(<span class="string">'Vertical Velocity'</span>)
+
+Velocity = sqrt(velH.^2 + velV.^2);
+figure(5)
+axe1 = subplot(3,1,1)
+
+plot(time , [Velocity , 0])
+title(<span class="string">'Total Velocity'</span>)
+axe2 = subplot(3,1,2)
+title(<span class="string">'Velocities'</span>)
+hold <span class="string">on</span>
+plot(time , [velH , 0])
+plot(time , [velV , 0])
+
+axe3 = subplot(3,1,3)
+title(<span class="string">'Position'</span>)
+hold <span class="string">on</span>
+plot(time , Detrended_Raw_Horizontal*20);
+plot(time, Detrended_Raw_Vertical*20);
+<span class="comment">% plot(velV,velH)</span>
+linkaxes([axe1 , axe2 , axe3])
+</pre><pre class="codeoutput">
+axe1 = 
+
+  Axes with properties:
+
+             XLim: [0 1]
+             YLim: [0 1]
+           XScale: 'linear'
+           YScale: 'linear'
+    GridLineStyle: '-'
+         Position: [0.1300 0.7093 0.7750 0.2157]
+            Units: 'normalized'
+
+  Use GET to show all properties
+
+
+axe2 = 
+
+  Axes with properties:
+
+             XLim: [0 1]
+             YLim: [0 1]
+           XScale: 'linear'
+           YScale: 'linear'
+    GridLineStyle: '-'
+         Position: [0.1300 0.4096 0.7750 0.2157]
+            Units: 'normalized'
+
+  Use GET to show all properties
+
+
+axe3 = 
+
+  Axes with properties:
+
+             XLim: [0 1]
+             YLim: [0 1]
+           XScale: 'linear'
+           YScale: 'linear'
+    GridLineStyle: '-'
+         Position: [0.1300 0.1100 0.7750 0.2157]
+            Units: 'normalized'
+
+  Use GET to show all properties
+
+</pre><img vspace="5" hspace="5" src="Alireza_Amiri_NMS_Assignment_3_05.png" alt=""> <img vspace="5" hspace="5" src="Alireza_Amiri_NMS_Assignment_3_06.png" alt=""> <img vspace="5" hspace="5" src="Alireza_Amiri_NMS_Assignment_3_07.png" alt=""> <h2 id="5">Calculating Blink,Fixation and Saccade frequency</h2><p>Question 3 Frequency of Blinking</p><pre class="codeinput">Blink_threshold = 0.2;
+Blinks = find_zc(time, Detrended_Raw_Horizontal, Blink_threshold);
+Blink_Frequency = numel(Blinks)/time(16001)
+figure(6)
+plot(time, Detrended_Raw_Horizontal, <span class="string">'b.-'</span>, Blinks, Blink_threshold*ones(size(Blinks)), <span class="string">'*r'</span>, <span class="string">'linewidth'</span>, 0.5, <span class="string">'markersize'</span>, 5);
+grid <span class="string">on</span>
+legend(<span class="string">'signal'</span>, <span class="string">'Blink Points'</span>);
+</pre><pre class="codeoutput">
+Blink_Frequency =
+
+    0.2812
+
+</pre><img vspace="5" hspace="5" src="Alireza_Amiri_NMS_Assignment_3_08.png" alt=""> <img vspace="5" hspace="5" src="Alireza_Amiri_NMS_Assignment_3_09.png" alt=""> <p>Frequency of Saccade</p><pre class="codeinput">Saccade_threshold = 0.8;
+Saccades = find_zc(time, [Velocity,0], Saccade_threshold);
+Saccade_Frequency = (numel(Saccades)-(numel(Blinks) * 2))/time(16001)
+
+figure(7)
+plot(time, [Velocity,0], <span class="string">'b.-'</span>, Saccades, Saccade_threshold*ones(size(Saccades)), <span class="string">'*r'</span>, <span class="string">'linewidth'</span>, 0.5, <span class="string">'markersize'</span>, 5);
+grid <span class="string">on</span>
+legend(<span class="string">'signal'</span>, <span class="string">'Saccade Points'</span>);
+</pre><pre class="codeoutput">
+Saccade_Frequency =
+
+    2.8436
+
+</pre><img vspace="5" hspace="5" src="Alireza_Amiri_NMS_Assignment_3_10.png" alt=""> <pre class="codeinput"><span class="comment">%Frequency of Fixation</span>
+Fixation_Frequency = (numel(Saccades)-numel(Blinks)+1)/time(16001)
+
+<span class="comment">% function to find zero crossings</span>
+<span class="keyword">function</span> [Zx] = find_zc(x, y, threshold)
+    y = y - threshold;
+    zci = @(data) find(diff(sign(data)) &gt; 0); <span class="comment">% function: returns indices of +ZCs</span>
+    ix = zci(y); <span class="comment">% find indices of + zero crossings of x</span>
+    ZeroX = @(x0, y0, x1, y1) x0 - (y0.*(x0 - x1))./(y0 - y1); <span class="comment">% Interpolated x value for Zero-Crossing</span>
+    Zx = ZeroX(x(ix), y(ix), x(ix+1), y(ix+1));
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">
+Fixation_Frequency =
+
+    3.1404
+
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2023a</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 clc
 clear all
@@ -98,12 +222,19 @@ close all
 
 load('D:\University\Khaje\Semester 1\کنترل سیستم های عصبی عضلانی\Assignment 3\data.mat')
 
-Raw_Horizontal = data.A;
-Raw_Vertical = data.B;
+Raw_Horizontal = data.B;
+Raw_Vertical = data.A;
 
 figure(1)
+hold on
+plot(1:length(Raw_Horizontal) , Raw_Horizontal);
+plot(1:length(Raw_Vertical) , Raw_Vertical);
+title('Raw data')
+legend('Raw Horizontal', 'Raw Vertical')
+
+figure(2)
 plot(Raw_Horizontal , Raw_Vertical)
-title('Vetical vs Horizontal')
+title('Vertical vs Horizontal')
 
 %% Detrend data and plot Signals
 % Question 1
@@ -111,7 +242,7 @@ title('Vetical vs Horizontal')
 Detrended_Raw_Horizontal = detrend(Raw_Horizontal);
 Detrended_Raw_Vertical = detrend(Raw_Vertical);
 
-figure(2)
+figure(3)
 title('Raw signals vs Detrended Signals')
 hold on
 plot(1:length(Raw_Horizontal) , Raw_Horizontal);
@@ -120,8 +251,72 @@ plot(1:length(Detrended_Raw_Horizontal) , Detrended_Raw_Horizontal);
 plot(1:length(Detrended_Raw_Vertical), Detrended_Raw_Vertical);
 legend('Raw Horizontal', 'Raw Vertical' , 'Detrended Raw Horizontal' ,'Detrended Raw Vertical' , 'Location','best')
 
+%% Finding Blink,Fixation and Saccade
+% Question 2
+%assuming sample rate is 250 Hz
+time = (1:length(Raw_Horizontal))/250;
+velH = diff(Detrended_Raw_Horizontal)./diff(time);
+velV = diff(Detrended_Raw_Vertical)./diff(time);
+figure(4)
+subplot(2,1,1)
+plot(time , [velH , 0])
+title('Horizontal Velocity')
+subplot(2,1,2)
+plot(time , [velV , 0])
+title('Vertical Velocity')
 
+Velocity = sqrt(velH.^2 + velV.^2);
+figure(5)
+axe1 = subplot(3,1,1)
 
+plot(time , [Velocity , 0])
+title('Total Velocity')
+axe2 = subplot(3,1,2)
+title('Velocities')
+hold on
+plot(time , [velH , 0])
+plot(time , [velV , 0])
+
+axe3 = subplot(3,1,3)
+title('Position')
+hold on
+plot(time , Detrended_Raw_Horizontal*20);
+plot(time, Detrended_Raw_Vertical*20);
+% plot(velV,velH)
+linkaxes([axe1 , axe2 , axe3])
+
+%% Calculating Blink,Fixation and Saccade frequency
+% Question 3
+% Frequency of Blinking
+Blink_threshold = 0.2;
+Blinks = find_zc(time, Detrended_Raw_Horizontal, Blink_threshold);
+Blink_Frequency = numel(Blinks)/time(16001)
+figure(6)
+plot(time, Detrended_Raw_Horizontal, 'b.-', Blinks, Blink_threshold*ones(size(Blinks)), '*r', 'linewidth', 0.5, 'markersize', 5);
+grid on
+legend('signal', 'Blink Points');
+%%
+% Frequency of Saccade
+Saccade_threshold = 0.8;
+Saccades = find_zc(time, [Velocity,0], Saccade_threshold);
+Saccade_Frequency = (numel(Saccades)-(numel(Blinks) * 2))/time(16001)
+
+figure(7)
+plot(time, [Velocity,0], 'b.-', Saccades, Saccade_threshold*ones(size(Saccades)), '*r', 'linewidth', 0.5, 'markersize', 5);
+grid on
+legend('signal', 'Saccade Points');
+%%
+%Frequency of Fixation
+Fixation_Frequency = (numel(Saccades)-numel(Blinks)+1)/time(16001)
+
+% function to find zero crossings
+function [Zx] = find_zc(x, y, threshold)
+    y = y - threshold;
+    zci = @(data) find(diff(sign(data)) > 0); % function: returns indices of +ZCs
+    ix = zci(y); % find indices of + zero crossings of x
+    ZeroX = @(x0, y0, x1, y1) x0 - (y0.*(x0 - x1))./(y0 - y1); % Interpolated x value for Zero-Crossing
+    Zx = ZeroX(x(ix), y(ix), x(ix+1), y(ix+1));
+end
 
 
 ##### SOURCE END #####
