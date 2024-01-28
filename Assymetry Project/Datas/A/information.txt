@@ -1,0 +1,11 @@
+type:	0
+F_Name:	Akram
+L_Name:	Shojaei
+Description:	
+Weight:	50
+Height:	161
+Gender:	1
+Year:	1998
+Month:	3
+Day:	30
+Sync:	False
