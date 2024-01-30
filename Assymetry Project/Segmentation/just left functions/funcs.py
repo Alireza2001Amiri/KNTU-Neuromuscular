@@ -322,18 +322,11 @@ def cycle_df(data,limits):
            angle_dict[angle] = cycles
        data_frame = pd.DataFrame(angle_dict)
        return data_frame
-def lim_ex_r(data, ws=50):
-    
-    y = data.right_hip.sagittal
-    y_s, _ = signal_smooth(y,ws)
-    cycle_lim = cycle_index(y_s)
-    return cycle_lim   
-
+   
 def lim_ex(data, ws=50):
     
     y = data.left_hip.sagittal
     y_s, _ = signal_smooth(y,ws)
     cycle_lim = cycle_index(y_s)
     return cycle_lim
-
 
